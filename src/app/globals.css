@@ -1,0 +1,260 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   Tristán Map · sistema de diseño
+   Los tokens de :root controlan la interfaz (no el mapa: los colores del
+   mapa base se editan desde el panel → "Mapa base").
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Superficies */
+  --paper: #f3eee3;
+  --surface: #fffdf8;
+  --surface-2: #f7f2e8;
+  --surface-3: #ece5d6;
+  --line: #e2d9c7;
+  --line-strong: #cbbfa8;
+
+  /* Tinta */
+  --ink: #1f2a2e;
+  --ink-2: #4b5357;
+  --ink-3: #7c7f7b;
+  --ink-inverse: #fffdf8;
+
+  /* Marca */
+  --accent: #d9572b;
+  --accent-ink: #ffffff;
+  --accent-soft: #fbe6dc;
+  --celeste: #2f6fb2;
+  --ok: #2f7d4a;
+  --danger: #c0392b;
+  --danger-soft: #fbe3df;
+
+  /* Forma */
+  --radius-s: 8px;
+  --radius: 14px;
+  --radius-l: 22px;
+  --shadow-1: 0 1px 2px rgb(31 42 46 / 0.08), 0 2px 8px rgb(31 42 46 / 0.06);
+  --shadow-2: 0 4px 12px rgb(31 42 46 / 0.1), 0 16px 40px rgb(31 42 46 / 0.12);
+  --focus-ring: 0 0 0 3px rgb(217 87 43 / 0.35);
+
+  /* Tipografía */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Botones ───────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.btn--primary:hover {
+  background: color-mix(in srgb, var(--accent) 88%, black);
+  border-color: color-mix(in srgb, var(--accent) 88%, black);
+}
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+.btn--ghost:hover {
+  background: var(--surface-2);
+  border-color: transparent;
+}
+.btn--danger {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 30%, transparent);
+}
+.btn--danger:hover {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+.btn--sm {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.btn--icon {
+  width: 40px;
+  padding: 0;
+}
+.btn--sm.btn--icon {
+  width: 32px;
+}
+.btn svg {
+  flex: none;
+}
+
+/* ─── Ajustes de MapLibre ───────────────────────────────────────────────── */
+.maplibregl-map {
+  font-family: var(--font-sans);
+}
+.maplibregl-ctrl-group {
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-1) !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button {
+  width: 36px !important;
+  height: 36px !important;
+}
+.maplibregl-ctrl-attrib {
+  font-size: 11px;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  background: rgb(255 253 248 / 0.9);
+}
+
+/* ─── Utilidades compartidas ────────────────────────────────────────────── */
+.swatch {
+  display: inline-block;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--swatch);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+.swatch--line {
+  height: 8px;
+  border-radius: 4px;
+  align-self: center;
+}
+.swatch--dashed {
+  background: repeating-linear-gradient(90deg, var(--swatch) 0 6px, transparent 6px 10px);
+  box-shadow: none;
+}
+.swatch--dotted {
+  background: radial-gradient(circle, var(--swatch) 2.5px, transparent 3px) 0 50% / 8px 8px repeat-x;
+  box-shadow: none;
+}
+.swatch--area {
+  background: color-mix(in srgb, var(--swatch) 35%, transparent);
+  box-shadow: inset 0 0 0 2px var(--swatch);
+}
+
+.chip-icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--chip-color, var(--ink));
+}
+.chip-icon img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

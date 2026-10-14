@@ -1,0 +1,19 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# entorno (secretos)
+.env
+.env.local
+.env.*.local
+
+# base de datos local y archivos subidos (modo local)
+data/
+
+.DS_Store
+Thumbs.db
+
+# generado en postinstall
+public/vendor/

@@ -1,0 +1,34 @@
+{
+  "name": "tristanmap",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mapa interactivo de la Feria de Tristán Narvaja (Montevideo, Uruguay)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node scripts/copy-maplibre-worker.mjs",
+    "streets": "node scripts/fetch-streets.mjs"
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
+    "jose": "^6.2.12",
+    "maplibre-gl": "^6.14.0",
+    "next": "^16.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^5.9.3"
+  }
+}
