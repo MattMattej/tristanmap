@@ -17,3 +17,6 @@ Thumbs.db
 
 # generado en postinstall
 public/vendor/
+
+.vercel
+.env*
