@@ -31,11 +31,11 @@ const json = (method: string, body: unknown): RequestInit => ({
 export const api = {
   data: () => request<MapData>('/api/admin/data', { method: 'GET' }),
   put: <C extends CollectionName>(collection: C, item: CollectionItem<C>) =>
-    request<CollectionItem<C>>(`/api/admin/${collection}`, json('PUT', item)),
+    request<CollectionItem<C>>(`/api/admin/collections/${collection}`, json('PUT', item)),
   remove: (collection: CollectionName, id: string) =>
-    request<{ ok: true }>(`/api/admin/${collection}/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+    request<{ ok: true }>(`/api/admin/collections/${collection}/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   reorder: (collection: 'categories' | 'legend', ids: string[]) =>
-    request<{ ok: true }>(`/api/admin/${collection}/reorder`, json('POST', { ids })),
+    request<{ ok: true }>(`/api/admin/collections/${collection}/reorder`, json('POST', { ids })),
   settings: (settings: Settings) => request<Settings>('/api/admin/settings', json('PUT', settings)),
   upload: (blob: Blob, kind: 'photo' | 'thumb' | 'icon') => {
     const form = new FormData();

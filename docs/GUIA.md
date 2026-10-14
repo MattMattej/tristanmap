@@ -270,9 +270,9 @@ src/
     api/health/              GET  chequeo de salud (y "despertador" de Supabase)
     api/admin/login|logout   Sesión (cookie httpOnly firmada, 7 días)
     api/admin/data           GET  todo el contenido, incluidos borradores
-    api/admin/[collection]   PUT  crear o actualizar (categories | legend | features)
-    api/admin/[collection]/[id]      DELETE
-    api/admin/[collection]/reorder   POST orden
+    api/admin/collections/[collection]          PUT  crear o actualizar (categories | legend | features)
+    api/admin/collections/[collection]/[id]     DELETE
+    api/admin/collections/[collection]/reorder  POST orden
     api/admin/settings       PUT  ajustes y estilo
     api/admin/upload         POST imágenes (valida tipo real y tamaño)
     uploads/[...path]        Sirve las fotos en modo local
