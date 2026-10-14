@@ -7,6 +7,7 @@
  * en vivo desde el panel con applyBaseTheme(), sin recargar el mapa.
  */
 import type { Map as MLMap, StyleSpecification } from 'maplibre-gl';
+import { MONTEVIDEO_BOUNDS } from '@/lib/defaults';
 import type { BaseTheme } from '@/lib/schemas';
 
 export const TILES_URL = 'https://tiles.openfreemap.org/planet';
@@ -179,6 +180,8 @@ export function buildBaseStyle(theme: BaseTheme): StyleSpecification {
       omt: {
         type: 'vector',
         url: TILES_URL,
+        // Solo se piden teselas de Montevideo: menos datos y carga más rápida.
+        bounds: [MONTEVIDEO_BOUNDS[0][0], MONTEVIDEO_BOUNDS[0][1], MONTEVIDEO_BOUNDS[1][0], MONTEVIDEO_BOUNDS[1][1]],
         attribution:
           '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · Datos © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
       },

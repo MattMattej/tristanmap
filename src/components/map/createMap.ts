@@ -1,4 +1,5 @@
 import { AttributionControl, Map as MLMap, NavigationControl, setWorkerUrl } from 'maplibre-gl';
+import { MONTEVIDEO_BOUNDS } from '@/lib/defaults';
 import type { Settings } from '@/lib/schemas';
 import { buildBaseStyle } from './baseStyle';
 import { addOverlayLayers } from './overlays';
@@ -8,7 +9,7 @@ let workerConfigured = false;
 export interface CreateMapOptions {
   container: HTMLElement;
   settings: Settings;
-  /** En el editor no restringimos la navegación a los límites. */
+  /** En el editor se puede recorrer todo Montevideo aunque el público tenga límites más chicos. */
   restrictBounds?: boolean;
   onLoad?: (map: MLMap) => void;
 }
@@ -27,7 +28,8 @@ export function createMap({ container, settings, restrictBounds = true, onLoad }
     bearing: view.bearing,
     minZoom: view.minZoom,
     maxZoom: view.maxZoom,
-    maxBounds: restrictBounds && view.bounds ? view.bounds : undefined,
+    // Nunca se sale de Montevideo; el público puede tener un límite más chico.
+    maxBounds: restrictBounds && view.bounds ? view.bounds : MONTEVIDEO_BOUNDS,
     attributionControl: false,
     dragRotate: false,
     pitchWithRotate: false,

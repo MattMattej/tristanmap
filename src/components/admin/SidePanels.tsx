@@ -471,7 +471,7 @@ export function BasePanel({ ed, onUseCurrentView, onSetBoundsToView, onDrawFocus
           </button>
           {settings.view.bounds && (
             <button className="btn btn--sm btn--ghost" onClick={() => setView({ bounds: null })}>
-              Sin límites
+              Todo Montevideo
             </button>
           )}
         </div>

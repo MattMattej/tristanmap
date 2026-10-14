@@ -7,7 +7,7 @@ import { Icon, type IconName } from '@/components/Icon';
 import { applyBaseTheme } from '@/components/map/baseStyle';
 import { createMap } from '@/components/map/createMap';
 import { highlightSelection, renderOverlays } from '@/components/map/overlays';
-import { byOrder, featureBounds, featureCenter, newId, swatchClass } from '@/lib/format';
+import { byOrder, featureBounds, featureCenter, formatBytes, newId, swatchClass } from '@/lib/format';
 import type { MapData, MapFeature } from '@/lib/schemas';
 import { api } from './api';
 import { DrawController, type Editable, type Pos, type Tool } from './drawing';
@@ -78,6 +78,11 @@ export default function Editor({ initialData, driver, ephemeral, username }: { i
   const [brushArea, setBrushArea] = useState<string | null>(areaLegend[0]?.id ?? null);
 
   const selected = useMemo(() => data.features.find((f) => f.id === selectedId), [data.features, selectedId]);
+  /** Espacio que ocupan las fotos (la miniatura suma ≈ 15% más). */
+  const photoUsage = useMemo(() => {
+    const photos = data.features.filter((f) => f.photo);
+    return { count: photos.length, bytes: Math.round(photos.reduce((n, f) => n + (f.photo?.bytes ?? 0), 0) * 1.15) };
+  }, [data.features]);
 
   const showToast = useCallback((msg: string, kind: 'ok' | 'error' = 'ok', action?: { label: string; run: () => void }) => {
     window.clearTimeout(toastTimer.current);
@@ -185,7 +190,7 @@ export default function Editor({ initialData, driver, ephemeral, username }: { i
         setReady(true);
       },
     });
-    map.setMinZoom(12);
+    map.setMinZoom(10.5);
     map.setMaxZoom(21);
     mapRef.current = map;
     return () => {
@@ -463,6 +468,8 @@ export default function Editor({ initialData, driver, ephemeral, username }: { i
         )}
         <footer className="ed__side-foot">
           Datos: <strong>{driver === 'supabase' ? 'Supabase' : ephemeral ? 'en memoria (demostración)' : 'local (data/db.json)'}</strong>
+          <br />
+          Fotos: {photoUsage.count} · {formatBytes(photoUsage.bytes)} de 1 GB gratis
         </footer>
       </aside>
 

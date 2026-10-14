@@ -25,7 +25,7 @@ export function toPublic(data: MapData): MapData {
  * diseñadora guarda un cambio (invalidamos el tag) o, como máximo, una vez
  * por hora: miles de visitas no generan miles de consultas.
  */
-export const getPublicSnapshot = unstable_cache(async () => toPublic(await getStore().readAll()), ['public-snapshot-v1'], {
+export const getPublicSnapshot = unstable_cache(async () => toPublic(await getStore().readAll()), ['public-snapshot-v2'], {
   tags: [MAP_TAG],
   revalidate: 3600,
 });

@@ -5,6 +5,15 @@
  */
 import type { BaseTheme, Category, LegendItem, MapData, MapFeature, Settings } from './schemas';
 
+/**
+ * Departamento de Montevideo (con un pequeño margen): el mapa no deja salir
+ * de acá y no se descargan teselas de afuera.
+ */
+export const MONTEVIDEO_BOUNDS: [[number, number], [number, number]] = [
+  [-56.45, -34.97],
+  [-56.0, -34.69],
+];
+
 export const THEME_PRESETS: Record<string, { label: string; theme: BaseTheme }> = {
   papel: {
     label: 'Papel',
@@ -107,12 +116,10 @@ export const DEFAULT_SETTINGS: Settings = {
     center: [-56.1788, -34.9001],
     zoom: 16.4,
     bearing: 0,
-    minZoom: 14.5,
+    minZoom: 11,
     maxZoom: 20,
-    bounds: [
-      [-56.1915, -34.9105],
-      [-56.1655, -34.8905],
-    ],
+    // null = todo Montevideo (MONTEVIDEO_BOUNDS)
+    bounds: null,
   },
   base: THEME_PRESETS.papel.theme,
   focus: {

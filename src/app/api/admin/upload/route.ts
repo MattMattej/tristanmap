@@ -8,9 +8,9 @@ import { getStore } from '@/lib/store';
  * acá validamos tipo real (magic bytes) y tamaño máximo.
  */
 const LIMITS = {
-  photo: 1_500_000,
-  thumb: 300_000,
-  icon: 300_000,
+  photo: 600_000,
+  thumb: 80_000,
+  icon: 120_000,
 } as const;
 type Kind = keyof typeof LIMITS;
 

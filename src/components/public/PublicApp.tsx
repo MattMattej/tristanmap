@@ -7,13 +7,17 @@ import { createMap } from '@/components/map/createMap';
 import { CLICKABLE_LAYERS, highlightSelection, renderOverlays } from '@/components/map/overlays';
 import { addUserLocationLayers, distanceMeters, formatDistance, insideBounds, setUserLocation } from '@/components/map/userLocation';
 import { directionsUrl, featureBounds, featureCenter } from '@/lib/format';
+import { MONTEVIDEO_BOUNDS } from '@/lib/defaults';
 import type { MapData } from '@/lib/schemas';
 import { AboutPanel, DetailPanel, ExplorePanel, Sheet } from './Panels';
 import { LegendCard } from './LegendCard';
 import './public.css';
 
 type PanelName = 'explore' | 'about' | null;
-type Locate = { state: 'off' } | { state: 'searching' } | { state: 'on'; pos: [number, number]; far: boolean };
+type Locate = { state: 'off' } | { state: 'searching' } | { state: 'on'; pos: [number, number]; far: boolean; outside: boolean };
+
+/** A más de esta distancia de la feria, mostramos el cartel con la distancia y "Cómo llegar". */
+const NEAR_METERS = 900;
 
 const isMobile = () => window.matchMedia('(max-width: 899px)').matches;
 
@@ -125,8 +129,6 @@ export default function PublicApp({ data, initialSelectedId }: { data: MapData; 
   const restoreFeriaView = useCallback(() => {
     const map = mapRef.current;
     if (!map) return;
-    map.setMinZoom(settings.view.minZoom);
-    if (settings.view.bounds) map.setMaxBounds(settings.view.bounds);
     map.flyTo({ center: settings.view.center, zoom: settings.view.zoom, padding: { top: 0, bottom: 0, left: 0, right: 0 }, duration: 900 });
   }, [settings.view]);
 
@@ -149,14 +151,17 @@ export default function PublicApp({ data, initialSelectedId }: { data: MapData; 
         const map = mapRef.current;
         if (!map) return;
         const pos: [number, number] = [p.coords.longitude, p.coords.latitude];
-        const far = !insideBounds(pos, settings.view.bounds);
-        setLocate({ state: 'on', pos, far });
+        const outside = !insideBounds(pos, settings.view.bounds ?? MONTEVIDEO_BOUNDS);
+        const far = outside || distanceMeters(pos, settings.view.center) > NEAR_METERS;
+        setLocate({ state: 'on', pos, far, outside });
         if (!first) return;
         first = false;
+        if (outside) {
+          // Fuera del mapa (fuera de Montevideo): no movemos el mapa, mostramos el cartel.
+          return;
+        }
         if (far) {
-          // Estás fuera de la feria: abrimos el mapa para mostrarte a vos y a la feria.
-          map.setMaxBounds(null);
-          map.setMinZoom(3);
+          // Lejos de la feria: encuadramos a la persona y a la feria juntas.
           const b = new LngLatBounds(pos, pos).extend(settings.view.center);
           map.fitBounds(b, { padding: isMobile() ? { top: 190, bottom: 260, left: 50, right: 50 } : 140, maxZoom: 16, duration: 1200 });
         } else {
@@ -240,7 +245,8 @@ export default function PublicApp({ data, initialSelectedId }: { data: MapData; 
         {locate.state === 'on' && locate.far && (
           <div className="locate__card">
             <span>
-              Estás a <strong>{formatDistance(distance)}</strong> de la feria
+              {locate.outside ? 'Estás fuera del mapa, a ' : 'Estás a '}
+              <strong>{formatDistance(distance)}</strong> de la feria
             </span>
             <div className="locate__actions">
               <a className="btn btn--primary btn--sm" href={directionsUrl(settings.view.center)} target="_blank" rel="noopener noreferrer">

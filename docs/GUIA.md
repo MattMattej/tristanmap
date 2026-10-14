@@ -47,8 +47,9 @@ Cada franja o zona tiene un **significado** (un ítem de la *Leyenda*) y cada pu
 - **Los datos tienen dos modos**, que se cambian con una variable:
   - `DATA_DRIVER=local`: todo queda en `data/db.json` y las fotos en `data/uploads/`. Sirve para desarrollar sin crear cuentas.
   - `DATA_DRIVER=supabase`: Postgres más Storage de Supabase, en la capa gratuita. Es el modo de producción.
+- **Solo Montevideo**: el mapa no deja salir del departamento de Montevideo ni se descargan teselas de afuera (`MONTEVIDEO_BOUNDS` en `src/lib/defaults.ts`). Desde Estilo → *Vista inicial y límites* se puede achicar el área ("Limitar a la vista") o volver a todo Montevideo.
 - **Caché**: el público nunca le pega directo a la base. La página usa una "foto" (snapshot) del contenido que se renueva **solo cuando la diseñadora guarda un cambio**, o como mucho una vez por hora. Mil visitas no generan mil consultas, así que los límites de la capa gratuita no son un problema.
-- **Imágenes livianas**: las fotos se comprimen **en el navegador, antes de subir**. Se redimensionan a 1600 px como máximo y se convierten a WebP, y además se genera una miniatura de 480 px. Una foto de celular de 3–5 MB queda en unos **100–250 KB**, más una miniatura de 15–40 KB. Los íconos (SVG, PNG o JPG) se convierten a PNG de 128 px. Por seguridad nunca se sirven SVG subidos por usuarios.
+- **Imágenes livianas**: las fotos se comprimen **en el navegador, antes de subir**. Se redimensionan a 1280 px como máximo, se convierten a WebP (sin metadata EXIF/GPS) y se genera una miniatura de 320 px. Una foto de celular de 3–5 MB queda en unos **60–150 KB**, más una miniatura de unos 10–18 KB. Los íconos (SVG, PNG, JPG o WebP) se convierten a WebP de 96 px con transparencia (unos 2–6 KB). El servidor rechaza cualquier archivo que supere esos máximos (fotos 600 KB, miniaturas 80 KB, íconos 120 KB). Por seguridad nunca se sirven SVG subidos por usuarios. El pie del Estudio muestra cuánto espacio ocupan las fotos.
 
 ---
 
@@ -198,7 +199,7 @@ La combinación recomendada es **Vercel** (hosting de la app) más **Supabase** 
    - **service_role key** (secreta, **nunca** va en el navegador), que va en `SUPABASE_SERVICE_ROLE_KEY`
 4. La primera vez que la app se conecte va a cargar sola el contenido de ejemplo.
 
-> **¿Y los límites gratis?** Los de Supabase Free (pueden cambiar; revisá la web de Supabase) son 500 MB de base de datos, 1 GB de archivos y sin límite de consultas a la API. Con fotos de unos 150 KB entran unas **6.000 fotos**. La base casi no recibe consultas gracias al caché. El único detalle es que **Supabase pausa los proyectos gratis tras 7 días sin actividad**. Para evitarlo, el proyecto incluye un cron diario (`vercel.json`) que visita `/api/health` y mantiene el proyecto activo.
+> **¿Y los límites gratis?** Los de Supabase Free (pueden cambiar; revisá la web de Supabase) son 500 MB de base de datos, 1 GB de archivos y sin límite de consultas a la API. Con fotos de unos 100–150 KB (más su miniatura) entran **entre 6.000 y 9.000 fotos**. La base casi no recibe consultas gracias al caché. El único detalle es que **Supabase pausa los proyectos gratis tras 7 días sin actividad**. Para evitarlo, el proyecto incluye un cron diario (`vercel.json`) que visita `/api/health` y mantiene el proyecto activo.
 
 ### 6.2 Vercel (la app)
 
@@ -344,7 +345,7 @@ scripts/fetch-streets.mjs    Regenera las cuadras desde OpenStreetMap
 | "Sesión vencida" en el Estudio | La sesión dura 7 días. Volvé a ingresar. |
 | "No se pudo guardar: …" | El mensaje dice qué campo está mal (por ejemplo, un título vacío). Corregilo y se guarda solo. |
 | Los cambios no aparecen en el sitio público | Refrescá la página. Si usás Supabase, revisá en Vercel → Logs que no haya errores de conexión. |
-| La foto no sube | El máximo después de comprimir es 1,5 MB. Si es un formato raro (HEIC de iPhone), exportala como JPG primero. |
+| La foto no sube | El máximo después de comprimir es 600 KB (el panel comprime solo, así que normalmente no se llega). Si es un formato raro (HEIC de iPhone), exportala como JPG primero. |
 | Todo anda lento en Windows | Ver la nota sobre OneDrive en la sección 2. |
 | En `npm run dev` el mapa se ve con colores o posiciones raras | Caché vieja de desarrollo: pará el servidor, borrá la carpeta `.next` y volvé a levantar. |
 | Quiero empezar de cero (local) | Pará el servidor, borrá la carpeta `data/` y volvé a levantar. |

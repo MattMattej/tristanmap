@@ -1,8 +1,10 @@
 /**
- * Procesamiento de imágenes en el navegador, antes de subirlas:
- *  - Fotos: se redimensionan y comprimen a WebP (≈ 80–200 KB) + miniatura (≈ 15 KB).
- *  - Íconos: se rasterizan a PNG cuadrado de 128 px (también los SVG,
- *    así nunca servimos SVG subidos por usuarios, que pueden traer scripts).
+ * Procesamiento de imágenes en el navegador, antes de subirlas. Está afinado
+ * para que el espacio gratuito de Supabase rinda al máximo:
+ *  - Fotos: máx. 1280 px, WebP de ≈ 60–130 KB + miniatura de 320 px (≈ 10–18 KB).
+ *    Se pierde también la metadata (EXIF, GPS), que no hace falta y pesa.
+ *  - Íconos: WebP cuadrado de 96 px con transparencia (≈ 2–6 KB). Los SVG
+ *    también se rasterizan: nunca servimos SVG subidos (pueden traer scripts).
  */
 
 export interface CompressedImage {
@@ -11,11 +13,12 @@ export interface CompressedImage {
   height: number;
 }
 
-const PHOTO_MAX_SIDE = 1600;
-const PHOTO_TARGET_BYTES = 220_000;
-const THUMB_MAX_SIDE = 480;
-const THUMB_TARGET_BYTES = 40_000;
-const ICON_SIZE = 128;
+const PHOTO_MAX_SIDE = 1280;
+const PHOTO_FALLBACK_SIDE = 1024;
+const PHOTO_TARGET_BYTES = 130_000;
+const THUMB_MAX_SIDE = 320;
+const THUMB_TARGET_BYTES = 18_000;
+const ICON_SIZE = 96;
 
 async function loadImage(file: Blob): Promise<HTMLImageElement> {
   const url = URL.createObjectURL(file);
@@ -56,7 +59,7 @@ async function encode(canvas: HTMLCanvasElement, targetBytes: number) {
   const probe = await canvasToBlob(canvas, 'image/webp', 0.8);
   const type = probe.type === 'image/webp' ? 'image/webp' : 'image/jpeg';
   let best = type === 'image/webp' ? probe : await canvasToBlob(canvas, type, 0.8);
-  for (const q of [0.72, 0.62, 0.52, 0.42]) {
+  for (const q of [0.7, 0.6, 0.5, 0.42, 0.35]) {
     if (best.size <= targetBytes) break;
     best = await canvasToBlob(canvas, type, q);
   }
@@ -69,8 +72,8 @@ export async function compressPhoto(file: File): Promise<{ full: CompressedImage
   const big = draw(img, PHOTO_MAX_SIDE);
   let full = { blob: await encode(big.canvas, PHOTO_TARGET_BYTES), width: big.width, height: big.height };
   // Si aún pesa mucho (fotos con mucho detalle), reducimos el tamaño.
-  if (full.blob.size > PHOTO_TARGET_BYTES * 1.6) {
-    const smaller = draw(img, 1200);
+  if (full.blob.size > PHOTO_TARGET_BYTES * 1.4) {
+    const smaller = draw(img, PHOTO_FALLBACK_SIDE);
     full = { blob: await encode(smaller.canvas, PHOTO_TARGET_BYTES), width: smaller.width, height: smaller.height };
   }
   const small = draw(img, THUMB_MAX_SIDE);
@@ -94,5 +97,7 @@ export async function rasterizeIcon(file: File): Promise<Blob> {
   const dw = w * scale;
   const dh = h * scale;
   ctx.drawImage(img, (ICON_SIZE - dw) / 2, (ICON_SIZE - dh) / 2, dw, dh);
-  return canvasToBlob(canvas, 'image/png');
+  // WebP mantiene la transparencia y pesa mucho menos que PNG.
+  const webp = await canvasToBlob(canvas, 'image/webp', 0.9);
+  return webp.type === 'image/webp' ? webp : canvasToBlob(canvas, 'image/png');
 }
