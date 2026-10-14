@@ -10,7 +10,7 @@ next-env.d.ts
 .env.*.local
 
 # base de datos local y archivos subidos (modo local)
-data/
+/data/
 
 .DS_Store
 Thumbs.db
